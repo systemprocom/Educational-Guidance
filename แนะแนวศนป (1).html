@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>แนะแนวโรงเรียนศาสนูปถัมภ์ปากพะยูน มูลนิธิ</title>
+<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--primary:#1E3A8A;--accent:#1E3A8A;--bg:#F0F9FF;--soft:#FFF1F7;--mid:#DBEAFE;--ink:#1f2a44}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden;background:var(--bg);font-family:'Prompt','Noto Sans Thai',system-ui,sans-serif;color:var(--ink)}
+#wrap{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+#stage{width:1280px;height:720px;position:relative;flex:none;transform-origin:center center}
+.slide{position:absolute;inset:0;background:#fff;border-radius:36px;box-shadow:0 10px 40px rgba(30,58,138,.12),0 2px 8px rgba(30,58,138,.08);padding:48px 64px 56px;display:none;flex-direction:column}
+.slide.active{display:flex}
+.tag{position:absolute;top:26px;left:34px;background:var(--mid);color:var(--primary);font-weight:700;font-size:16px;padding:6px 18px;border-radius:999px}
+.num{position:absolute;bottom:20px;right:34px;font-size:16px;font-weight:500;color:var(--primary);opacity:.7}
+h1,h2{font-weight:800;color:var(--primary);line-height:1.25}
+h2{font-size:46px;margin-top:30px}
+em{font-style:normal;background:linear-gradient(90deg,#1E3A8A,#3B82F6);-webkit-background-clip:text;background-clip:text;color:transparent}
+.sub{font-size:22px;color:#475577;margin-top:6px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:auto;margin-bottom:auto;padding-top:14px}
+.card{border-radius:26px;padding:28px 26px;display:flex;flex-direction:column;gap:12px;min-height:310px;opacity:0}
+.card.dark{background:var(--primary);color:#fff}
+.card.mid{background:var(--mid);color:var(--primary)}
+.card.soft{background:var(--soft);color:var(--primary)}
+.grid.c4{grid-template-columns:1fr 1fr;gap:20px}
+.grid.c4 .card{flex-direction:row;align-items:center;min-height:0;gap:22px;padding:18px 26px}
+.grid.c4 .ic{flex:none}
+.grid.c4 .card p{font-size:19px;line-height:1.5}
+.grid.c4 .card h3{font-size:25px;margin-bottom:4px}
+.slide.active .card:nth-child(4){animation-delay:.9s}
+.card h3{font-size:27px;font-weight:700;line-height:1.3}
+.card p{font-size:21px;line-height:1.55;font-weight:400}
+.ic{width:72px;height:72px;border-radius:50%;background:var(--primary);display:grid;place-items:center;transition:transform .25s}
+.card.dark .ic{background:#fff}
+.card.dark .ic svg{stroke:var(--primary)}
+.ic svg{width:38px;height:38px;fill:none;stroke:#fff;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.ic:hover{transform:scale(1.12)}
+.slide.active .card{animation:up .6s cubic-bezier(.2,.8,.2,1) forwards}
+.slide.active .card:nth-child(1){animation-delay:.15s}
+.slide.active .card:nth-child(2){animation-delay:.4s}
+.slide.active .card:nth-child(3){animation-delay:.65s}
+.slide.active .head{animation:up .6s ease both}
+@keyframes up{from{opacity:0;transform:translateY(40px)}to{opacity:1;transform:none}}
+.head{display:flex;justify-content:space-between;align-items:flex-start}
+.head .ic{width:96px;height:96px;margin-top:30px}
+.head .ic svg{width:52px;height:52px}
+/* cover */
+.cover{justify-content:center;align-items:flex-start}
+.cover .ic{width:120px;height:120px;margin-bottom:26px}
+.cover .ic svg{width:66px;height:66px}
+.cover h1{font-size:68px}
+.cover .by{margin-top:26px;font-size:26px;color:#475577}
+.cover .chips{display:flex;gap:14px;margin-top:30px;flex-wrap:wrap}
+.chip{background:var(--soft);color:var(--primary);font-weight:700;font-size:22px;padding:10px 24px;border-radius:999px}
+.chip.d{background:var(--primary);color:#fff}
+.blob{position:absolute;right:-60px;bottom:-60px;width:380px;height:380px;border-radius:50%;background:var(--soft);z-index:0}
+.blob2{position:absolute;right:90px;top:-70px;width:200px;height:200px;border-radius:50%;background:var(--mid);z-index:0}
+.cover>*{position:relative;z-index:1}
+#nav{position:fixed;bottom:10px;left:50%;transform:translateX(-50%);display:flex;gap:10px;z-index:9}
+#nav button{width:44px;height:44px;border-radius:50%;border:none;background:var(--primary);color:#fff;font-size:20px;cursor:pointer;box-shadow:0 3px 10px rgba(30,58,138,.3)}
+#nav button:hover{filter:brightness(1.2)}
+</style>
+</head>
+<body>
+<div id="wrap"><div id="stage"></div></div>
+<div id="nav"><button id="prev" aria-label="ก่อนหน้า">‹</button><button id="next" aria-label="ถัดไป">›</button></div>
+<script>
+const I={
+school:'<path d="M3 10l9-6 9 6"/><path d="M5 10v9h14v-9"/><path d="M10 19v-5h4v5"/>',
+book:'<path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 21V5"/>',
+star:'<path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/>',
+gift:'<rect x="3" y="8" width="18" height="4"/><path d="M12 8v13M5 12v9h14v-9M12 8c-2-4-6-3-5 0M12 8c2-4 6-3 5 0"/>',
+phone:'<path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/>',
+monitor:'<rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/>',
+globe:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/>',
+trophy:'<path d="M8 4h8v6a4 4 0 0 1-8 0zM8 6H4v2a3 3 0 0 0 4 3M16 6h4v2a3 3 0 0 1-4 3M12 14v4M8 20h8"/>',
+bus:'<rect x="4" y="4" width="16" height="13" rx="2"/><path d="M4 11h16M7 21v-4M17 21v-4"/>',
+flask:'<path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 2 3h10a2 2 0 0 0 2-3l-5-9V3"/>',
+users:'<circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0M16 5a3 3 0 0 1 0 6M21 20a6 6 0 0 0-4-5.6"/>',
+heart:'<path d="M12 20s-8-5-8-11a4.5 4.5 0 0 1 8-2.5A4.5 4.5 0 0 1 20 9c0 6-8 11-8 11z"/>',
+file:'<path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4M9 13h6M9 17h6"/>',
+moon:'<path d="M20 14A8 8 0 1 1 10 4a6 6 0 0 0 10 10z"/>',
+target:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/>',
+lang:'<path d="M4 5h8M8 3v2M5 5c1 4 4 7 7 8M11 5c-1 4-4 7-7 8M13 21l4-10 4 10M14.5 18h5"/>',
+pin:'<path d="M12 21s7-6 7-12a7 7 0 0 0-14 0c0 6 7 12 7 12z"/><circle cx="12" cy="9" r="2.5"/>'
+};
+const svg=n=>`<svg viewBox="0 0 24 24">${I[n]}</svg>`;
+const ic=n=>`<div class="ic">${svg(n)}</div>`;
+
+const slides=[
+{cover:1},
+{tag:'รู้จักโรงเรียนเรา',icon:'school',title:'เรามาจากไหนนะ? <em>ไปรู้จักกัน!</em>',sub:'โรงเรียนสำหรับเด็กๆ ที่อยากเก่งและเป็นคนดี',cards:[
+ ['trophy','โรงเรียนรางวัลพระราชทาน','ได้รับรางวัลพระราชทานถึง 2 สมัยแล้วนะ','dark'],
+ ['pin','อยู่ที่ไหน','อ.ปากพะยูน จ.พัทลุง ริมทะเลสาบ วิวสวยมาก','mid'],
+ ['heart','คำขวัญของเรา','เพิ่มพูนปัญญา ยึดมั่นศาสนา พัฒนาสังคม','soft'],
+ ['star','เราอยากให้หนูเป็น','เด็กเก่ง มีคุณธรรม รักศาสนา และเก่งภาษา','mid']]},
+{tag:'สมัครเรียนระดับไหน',icon:'users',title:'หนูเรียนชั้นไหนได้? <em>มาดูกัน</em>',sub:'เปิดรับนักเรียนใหม่ ปีการศึกษา 2570',cards:[
+ ['star','อนุบาล 1-3','อนุบาล 1 อายุ 3 ปี · อนุบาล 2 อายุ 4 ปี · อนุบาล 3 อายุ 5 ปี','dark'],
+ ['book','ประถมศึกษา','ป.1 รับน้องอายุ 6 ปีบริบูรณ์','mid'],
+ ['school','มัธยมต้น','เรียนต่อ ม.1 สำหรับพี่ๆ ที่จบชั้น ป.6','soft'],
+ ['school','มัธยมปลาย','เรียนต่อ ม.4 สำหรับพี่ๆ ที่จบชั้น ม.3','mid']]},
+{tag:'อนุบาล - ประถม',icon:'star',title:'น้องเล็กเรียนสนุก <em>ไม่น่าเบื่อ</em>',sub:'โปรแกรมพิเศษสำหรับระดับอนุบาลและประถม',cards:[
+ ['star','โครงการพิเศษ MEP','โปรแกรมพิเศษที่ช่วยให้น้องๆ เรียนรู้ได้เก่งขึ้น','dark'],
+ ['flask','นวัตกรรม Open Approach','เรียนรู้แบบเปิดกว้าง ฝึกคิดหลายแบบ ไม่ท่องจำอย่างเดียว','mid'],
+ ['book','ระบบมักตับ','เรียนอิสลามศึกษาตามหลักสูตรอิสลามศึกษา 2546','soft'],
+ ['lang','หลักสูตรจีนตกคณิต','มีให้เรียนทั้งระดับอนุบาลและประถม','mid']]},
+{tag:'มัธยมต้น · SMP',icon:'flask',title:'โปรแกรม SMP <em>เก่งวิทย์-คณิต</em>',sub:'Science and Mathematic Program สำหรับพี่ๆ ม.1-ม.3',cards:[
+ ['flask','เตรียมวิทย์ คณิต','เตรียมความพร้อมให้เก่งวิทยาศาสตร์และคณิตศาสตร์','dark'],
+ ['star','พัฒนาทักษะและสมรรถนะ','ทำกิจกรรมหลากหลาย ได้ลองและได้ฝึกจริง','mid'],
+ ['moon','โครงการตะฟิซไซน์','ท่องจำอัลกุรอานอย่างเป็นระบบ','soft'],
+ ['monitor','ห้องเรียนทันสมัย','มีห้องปฏิบัติการและห้องคอมพิวเตอร์ให้ใช้','mid']]},
+{tag:'มัธยมปลาย',icon:'globe',title:'พี่ ม.ปลาย <em>เตรียมสู่อนาคต</em>',sub:'เลือกเส้นทางที่ใช่ได้ 3 แผนการเรียน',cards:[
+ ['globe','เตรียมศึกษาต่อต่างประเทศ','โครงการชานาวี เรียนภาษาอาหรับเตรียมไปเรียนต่อ','dark'],
+ ['file','เตรียมสายอาชีพ','หลักสูตรเชื่อมโยงอาชีวะ Credit Bank','mid'],
+ ['flask','3 แผนการเรียน','วิทย์-คณิต · ศิลป์ทั่วไป · ศิลป์ภาษาอาหรับ (ชานาวี)','soft'],
+ ['target','นักศึกษาวิชาทหาร','มีหลักสูตรสำหรับนักเรียนชาย','mid']]},
+{tag:'เรียนศาสนา',icon:'moon',title:'เรียนศาสนา <em>อย่างมีความสุข</em>',sub:'เป็นมุสลิมที่ดี มีคุณภาพ',cards:[
+ ['book','ระบบมักตับ','ระดับประถม เรียนอิสลามศึกษาหลักสูตร 2546','dark'],
+ ['moon','ระบบตัรบียะห์อิสลาม','เรียนอิสลามศึกษาและอัลกุรอานไปพร้อมกัน','mid'],
+ ['moon','ตะฟิซอัลกุรอาน','โครงการท่องจำอัลกุรอาน','soft'],
+ ['heart','ใช้ชีวิตแบบอิสลาม','ฝึกวิถีชีวิตอิสลามและมารยาทดีๆ ทุกวัน','mid']]},
+{tag:'เก่งภาษา',icon:'lang',title:'เรียนภาษา <em>ได้หลายภาษา</em>',sub:'เก่งภาษา เปิดโลกกว้าง',cards:[
+ ['lang','ภาษาอังกฤษ','มีโครงการภาษาอังกฤษ ฝึกพูดกับครูต่างชาติ','dark'],
+ ['lang','ภาษาอาหรับ','เรียนผ่านโครงการภาษาอาหรับและชานาวี','mid'],
+ ['lang','ภาษามลายู','พัฒนาภาษามลายูให้โดดเด่น','soft'],
+ ['lang','ภาษาจีน','มีหลักสูตรจีนตกคณิตให้เรียน','mid']]},
+{tag:'กิจกรรมสนุก',icon:'trophy',title:'มีอะไรให้ทำ <em>เยอะแยะเลย</em>',sub:'เรียนเก่งก็ได้ เล่นกีฬาเก่งก็ได้',cards:[
+ ['monitor','ห้อง Smart Net Com','ห้องคอมพิวเตอร์ให้ฝึกใช้งานจริง','dark'],
+ ['trophy','แข่งขันวิชาการ','ลองส่งผลงานและแข่งขัน เก่งขึ้นทุกวัน','mid'],
+ ['target','กีฬาเด่น ยิงธนู','นักกีฬายิงธนูของเราเก่งมาก','soft'],
+ ['users','ฟุตบอล วอลเลย์บอล ตะกร้อ เปตอง','เลือกเล่นได้ตามที่ชอบ','mid']]},
+{tag:'เรียนฟรี',icon:'gift',title:'เรียนฟรี <em>ได้ของดีๆ เยอะ</em>',sub:'คุณพ่อคุณแม่สบายใจ',cards:[
+ ['gift','เรียนฟรี 15 ปี','ได้รับสิทธิ์ตามนโยบายเรียนฟรี 15 ปี','dark'],
+ ['heart','อาหารกลางวันและนมฟรี','สำหรับระดับอนุบาลและประถม','mid'],
+ ['monitor','เรียนคอมพิวเตอร์','มีวิชาคอมพิวเตอร์ให้เรียน','soft'],
+ ['users','กองทุนช่วยเหลือ','มีกองทุนอาหารกลางวัน เด็กกำพร้า ยากจน และกองทุนประกันอุบัติเหตุ','mid']]},
+{tag:'ทุนและบริการ',icon:'bus',title:'มีทุน <em>มีรถรับ-ส่ง</em>',sub:'ดูแลน้องๆ ใกล้ชิด',cards:[
+ ['star','ทุนเรียนดี ทุนกีฬา','ทุนเรียนดี/ความประพฤติดี ทุนกีฬา ทุนอัลกุรอาน','dark'],
+ ['users','ทุนช่วยเหลือ','ทุนมูลนิธิ ทุนเด็กกำพร้าและด้อยโอกาส ทุนกู้ยืมเพื่อการศึกษา','mid'],
+ ['bus','รถรับ-ส่ง','สำหรับอนุบาลและประถม','soft'],
+ ['school','หอพัก','มีหอพักสำหรับนักเรียนชายและหญิง','mid']]},
+{tag:'เตรียมตัวสมัคร',icon:'file',title:'อยากเป็นน้องใหม่ <em>ต้องเตรียมอะไร?</em>',sub:'ให้คุณพ่อคุณแม่ช่วยเตรียมนะ',cards:[
+ ['file','เอกสารนักเรียน','สำเนาสูติบัตร (อนุบาล-ประถม) ทะเบียนบ้านนักเรียน บัตรประชาชนนักเรียน (มัธยม)','dark'],
+ ['users','เอกสารผู้ปกครอง','สำเนาทะเบียนบ้านและบัตรประชาชน บิดา มารดา','mid'],
+ ['school','เอกสารการเรียน','หลักฐานจบการศึกษา (ม.1 และ ม.4) และหลักฐานจากโรงเรียนเดิมกรณีย้าย','soft'],
+ ['gift','รูปถ่ายและอื่นๆ','รูปถ่าย 1 นิ้วครึ่ง 2 รูป และใบเปลี่ยนชื่อสกุล (ถ้ามี)','mid']]},
+{tag:'ติดต่อเรา',icon:'phone',title:'มาเป็นน้องใหม่ของเรา <em>นะครับ/คะ!</em>',sub:'โรงเรียนศาสนูปถัมภ์ปากพะยูน มูลนิธิ',cards:[
+ ['gift','โปรโมชั่นแรกเข้า','ทุนเรียนดี ทุนนักกีฬา ทุนอัลกุรอาน ยืนยันสิทธิ์ 100 คนแรก รับของสัมมนาคุณ','dark'],
+ ['phone','โทรโรงเรียน','074-699-476','mid'],
+ ['phone','ผอ.ปรีชา สังขาว','086-9692-962','soft'],
+ ['pin','ที่อยู่ และ Facebook','611 หมู่ 1 ต.ปากพะยูน อ.ปากพะยูน จ.พัทลุง 93120 · FB: โรงเรียนศาสนูปถัมภ์ปากพะยูน มูลนิธิ ศนป.','mid']]}
+];
+
+const stage=document.getElementById('stage');
+slides.forEach((s,i)=>{
+ const d=document.createElement('section');d.className='slide'+(s.cover?' cover':'');
+ if(s.cover){
+  d.innerHTML=`<div class="blob"></div><div class="blob2"></div>${ic('school')}
+  <h1>แนะแนว<br><em>โรงเรียนศาสนูปถัมภ์ปากพะยูน มูลนิธิ</em></h1>
+  <div class="by">นำเสนอโดย ฝ่ายวิเทศสัมพันธ์ โรงเรียนศาสนูปถัมภ์ปากพะยูน มูลนิธิ</div>
+  <div class="chips"><span class="chip d">รับสมัครนักเรียนใหม่ ปีการศึกษา 2570</span><span class="chip">โรงเรียนรางวัลพระราชทาน 2 สมัย</span></div>`;
+ } else {
+  d.innerHTML=`<div class="tag">${s.tag}</div>
+  <div class="head"><div><h2>${s.title}</h2><div class="sub">${s.sub}</div></div>${ic(s.icon)}</div>
+  <div class="grid c${s.cards.length}">${s.cards.map(c=>`<div class="card ${c[3]}">${ic(c[0])}<div><h3>${c[1]}</h3><p>${c[2]}</p></div></div>`).join('')}</div>`;
+ }
+ d.insertAdjacentHTML('beforeend',`<div class="num">${i+1} / ${slides.length}</div>`);
+ stage.appendChild(d);
+});
+const els=[...document.querySelectorAll('.slide')];
+let cur=0;
+function show(n){cur=Math.max(0,Math.min(els.length-1,n));els.forEach((e,i)=>e.classList.toggle('active',i===cur));location.hash=cur+1}
+function fit(){const s=Math.min(innerWidth/1320,(innerHeight-60)/760);stage.style.transform=`scale(${s})`}
+addEventListener('resize',fit);fit();
+document.getElementById('next').onclick=()=>show(cur+1);
+document.getElementById('prev').onclick=()=>show(cur-1);
+addEventListener('keydown',e=>{if(['ArrowRight','PageDown',' '].includes(e.key))show(cur+1);if(['ArrowLeft','PageUp'].includes(e.key))show(cur-1)});
+let x0=null;addEventListener('touchstart',e=>x0=e.touches[0].clientX);
+addEventListener('touchend',e=>{if(x0===null)return;const dx=e.changedTouches[0].clientX-x0;if(Math.abs(dx)>50)show(cur+(dx<0?1:-1));x0=null});
+show((parseInt(location.hash.slice(1))||1)-1);
+</script>
+</body>
+</html>
